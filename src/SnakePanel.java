@@ -31,18 +31,19 @@ public class SnakePanel extends JPanel implements ActionListener {
     private int x[] = new int[cellSum];
     private int y[] = new int[cellSum];
 
+    public SnakePanel(){
+        initPanel();
+    }
+
     private void uploadImages(){
         ImageIcon itemImage = new ImageIcon("C:\\Users\\NewUser\\Desktop\\snake\\src\\resources\\apple.png");
         ImageIcon snakeBodyImage = new ImageIcon("C:\\Users\\NewUser\\Desktop\\snake\\src\\resources\\snakeBody.png");
         ImageIcon snakeHeadImage = new ImageIcon("C:\\Users\\NewUser\\Desktop\\snake\\src\\resources\\snakeHead.png");
-        item = itemImage.getImage();
-        body = snakeBodyImage.getImage();
-        head = snakeHeadImage.getImage();
+        item = itemImage.getImage().getScaledInstance(10,-1,Image.SCALE_SMOOTH);
+        body = snakeBodyImage.getImage().getScaledInstance(10,-1,Image.SCALE_SMOOTH);
+        head = snakeHeadImage.getImage().getScaledInstance(10,-1,Image.SCALE_SMOOTH);
     }
 
-    public SnakePanel(){
-        initPanel();
-    }
 
     private void snakeMove(){
         for (int i = cells; i>0; i--){
@@ -70,7 +71,7 @@ public class SnakePanel extends JPanel implements ActionListener {
     }
 
     private void initPanel(){
-        setBackground(Color.GRAY);
+        setBackground(Color.gray);
         addKeyListener(new KeyMove());
         setFocusable(true);
         setPreferredSize(new Dimension(panelWidth, panelHeight));
@@ -136,6 +137,12 @@ public class SnakePanel extends JPanel implements ActionListener {
             checkCollision();
             snakeMove();
         }
+    }
+
+    @Override
+    public  void paintComponent(Graphics g){
+        super.paintComponent(g);
+        draw(g);
     }
 
     public class KeyMove extends KeyAdapter {
