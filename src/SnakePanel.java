@@ -3,6 +3,18 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class SnakePanel extends JPanel {
+
+    private int cellSize = 10;
+    private int panelWidth = 300;
+    private int panelHeight = 300;
+    private int cellSum = 900;
+    private int itemPos = 1;
+    private int delayGame = 500;
+
+    private int x[] = new int[cellSum];
+    private int y[] = new int[cellSum];
+
+
     private JLabel display;
     private JPanel panel;
 
