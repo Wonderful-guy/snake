@@ -1,11 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.util.concurrent.Delayed;
 
-public class SnakePanel extends JPanel {
+public class SnakePanel extends JPanel implements ActionListener {
 
     private int cellSize = 10;
     private int panelWidth = 310;
@@ -23,6 +21,7 @@ public class SnakePanel extends JPanel {
     private boolean right = true;
     private boolean up = false;
     private boolean down = false;
+    private boolean inGame = true;
 
     private Timer timer;
     private Image item;
@@ -45,9 +44,34 @@ public class SnakePanel extends JPanel {
         initPanel();
     }
 
+    private void snakeMove(){
+        for (int i = cells; i>0; i--){
+            x[i] = x[i-1];
+            y[i] = y[i-1];
+        }
+        if (up) x[0] -= cellSize;
+        else if (down) x[0] += cellSize;
+        else if (left) y[0] -= cellSize;
+        else if (right) y[0] += cellSize;
+    }
+
+    private void checkCollision(){
+        for (int i = cells; i>0; i--){
+            if ( (i>=5) && (x[0] == x[i]) && (y[0] == y[i]) ){
+                inGame = false;
+            }
+        }
+        if ((y[0] >= panelHeight) ||
+                (y[0] <= 0) ||
+                (x[0] >= panelWidth) ||
+                (x[0] <= 0)) {
+            inGame = false;
+        }
+    }
+
     private void initPanel(){
         setBackground(Color.GRAY);
-        addKeyListener(new TAdapt());
+        addKeyListener(new KeyMove());
         setFocusable(true);
         setPreferredSize(new Dimension(panelWidth, panelHeight));
         uploadImages();
@@ -70,19 +94,76 @@ public class SnakePanel extends JPanel {
             y[i] = 150;
         }
         spawnApple();
-        timer = new Timer(Delayed,this);
+        timer = new Timer(delayGame,this);
+        timer.start();
     }
 
-        private void checkItemEaten(){
-            if ((x[0] == itemX) && (y[0] == itemY)){
-                cells++;
-                spawnApple();
+    private void checkItemEaten(){
+        if ((x[0] == itemX) && (y[0] == itemY)){
+            cells++;
+            spawnApple();
+        }
+    }
+
+    private void draw(Graphics g){
+        g.drawImage(item, itemX, itemY, this);
+        for (int i=0; i<cells;i++){
+            if (i==0){
+                g.drawImage(head, x[i], y[i], this);
+            }
+            else{
+                g.drawImage(body, x[i], y[i], this);
             }
         }
+        Toolkit.getDefaultToolkit().sync();
+    }
+
+    private void gameOver(Graphics g){
+        String message = "Game Over";
+        Font fontGameOver = new Font("Arial", Font.BOLD, 15);
+        FontMetrics metrics = getFontMetrics(fontGameOver);
+
+        g.setColor(Color.BLUE);
+        g.setFont(fontGameOver);
+        g.drawString(message, panelWidth, panelHeight);
 
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (inGame){
+            checkItemEaten();
+            checkCollision();
+            snakeMove();
+        }
+    }
 
+    public class KeyMove extends KeyAdapter {
+        public void keyPressed(KeyEvent e){
+            int key = e.getKeyCode();
 
+            if ((key == KeyEvent.VK_LEFT) && (!right)){
+                left = true;
+                up = false;
+                down = false;
+            }
+            else if ((key == KeyEvent.VK_RIGHT) && (!left)){
+                right = true;
+                up = false;
+                down = false;
+            }
+            else if ((key == KeyEvent.VK_UP) && (!down)){
+                right = false;
+                up = true;
+                left = false;
+            }
+            else if ((key == KeyEvent.VK_DOWN) && (!up)){
+                right = false;
+                down = true;
+                left = false;
+            }
+        }
+    }
 }
+
 
