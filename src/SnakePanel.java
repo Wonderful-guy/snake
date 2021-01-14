@@ -1,21 +1,20 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.concurrent.Delayed;
 
 public class SnakePanel extends JPanel implements ActionListener {
 
-    private int cellSize = 10;
-    private int panelWidth = 310;
-    private int panelHeight = 310;
-    private int cellSum = panelHeight*panelWidth / (cellSize*cellSize);
-    private int itemPos = 1;
-    private int cellRandom = 31;
-    private int delayGame = 500;
+    private int cellSize = 40;
+    private int panelWidth = 15 * cellSize;
+    private int panelHeight = 15 * cellSize;
+    private int cellsTotal = panelHeight*panelWidth / (cellSize*cellSize);
+    private int cellRandomX = 15;
+    private int cellRandomY = 15;
+    private int delayGame = 300;
 
-    private int cells = 3;
-    private int itemX;
-    private int itemY;
+    private int cellsSnake;
+    private int appleX;
+    private int appleY;
 
     private boolean left = false;
     private boolean right = true;
@@ -24,99 +23,109 @@ public class SnakePanel extends JPanel implements ActionListener {
     private boolean inGame = true;
 
     private Timer timer;
-    private Image item;
+    private Image apple;
     private Image head;
     private Image body;
 
-    private int x[] = new int[cellSum];
-    private int y[] = new int[cellSum];
+    private final int[] xSnakeArray = new int[cellsTotal];
+    private final int[] ySnakeArray = new int[cellsTotal];
 
     public SnakePanel(){
         initPanel();
     }
 
-    private void uploadImages(){
-        ImageIcon itemImage = new ImageIcon("C:\\Users\\NewUser\\Desktop\\snake\\src\\resources\\apple.png");
-        ImageIcon snakeBodyImage = new ImageIcon("C:\\Users\\NewUser\\Desktop\\snake\\src\\resources\\snakeBody.png");
-        ImageIcon snakeHeadImage = new ImageIcon("C:\\Users\\NewUser\\Desktop\\snake\\src\\resources\\snakeHead.png");
-        item = itemImage.getImage().getScaledInstance(10,-1,Image.SCALE_SMOOTH);
-        body = snakeBodyImage.getImage().getScaledInstance(10,-1,Image.SCALE_SMOOTH);
-        head = snakeHeadImage.getImage().getScaledInstance(10,-1,Image.SCALE_SMOOTH);
-    }
-
-
-    private void snakeMove(){
-        for (int i = cells; i>0; i--){
-            x[i] = x[i-1];
-            y[i] = y[i-1];
-        }
-        if (up) x[0] -= cellSize;
-        else if (down) x[0] += cellSize;
-        else if (left) y[0] -= cellSize;
-        else if (right) y[0] += cellSize;
-    }
-
-    private void checkCollision(){
-        for (int i = cells; i>0; i--){
-            if ( (i>=5) && (x[0] == x[i]) && (y[0] == y[i]) ){
-                inGame = false;
-            }
-        }
-        if ((y[0] >= panelHeight) ||
-                (y[0] <= 0) ||
-                (x[0] >= panelWidth) ||
-                (x[0] <= 0)) {
-            inGame = false;
-        }
-    }
-
     private void initPanel(){
         setBackground(Color.gray);
-        addKeyListener(new KeyMove());
         setFocusable(true);
         setPreferredSize(new Dimension(panelWidth, panelHeight));
+        addKeyListener(new KeyMove());
         uploadImages();
         initGame();
     }
 
-    private void spawnApple(){
-        int newAxis;
-
-        newAxis = (int) Math.random() * cellRandom;
-        itemX = newAxis * cellSize;
-
-        newAxis = (int) Math.random() * cellRandom;
-        itemY = newAxis * cellSize;
-    }
-
     private void initGame(){
-        for (int i=0; i<cells;i++){
-            x[i] = 50 - i*10;
-            y[i] = 150;
-        }
+
+        cellsSnake = 3;
         spawnApple();
+
+        for (int i = 0; i< cellsSnake; i++){
+            xSnakeArray[i] = 4 * cellSize - i*cellSize;
+            ySnakeArray[i] = 4 * cellSize;
+        }
         timer = new Timer(delayGame,this);
         timer.start();
     }
 
-    private void checkItemEaten(){
-        if ((x[0] == itemX) && (y[0] == itemY)){
-            cells++;
+    private void uploadImages(){
+        ImageIcon appleImage = new ImageIcon("C:\\Users\\NewUser\\Desktop\\snake\\src\\resources\\apple.png");
+        ImageIcon snakeBodyImage = new ImageIcon("C:\\Users\\NewUser\\Desktop\\snake\\src\\resources\\snakeBody.png");
+        ImageIcon snakeHeadImage = new ImageIcon("C:\\Users\\NewUser\\Desktop\\snake\\src\\resources\\snakeHead.png");
+
+        apple = appleImage.getImage().getScaledInstance(cellSize,-1,Image.SCALE_SMOOTH);
+        body = snakeBodyImage.getImage().getScaledInstance(cellSize,-1,Image.SCALE_SMOOTH);
+        head = snakeHeadImage.getImage().getScaledInstance(cellSize,-1,Image.SCALE_SMOOTH);
+    }
+
+    private void snakeMove(){
+        for (int i = cellsSnake; i>0; i--){
+            xSnakeArray[i] = xSnakeArray[i-1];
+            ySnakeArray[i] = ySnakeArray[i-1];
+        }
+        if (up) ySnakeArray[0] -= cellSize;
+        else if (down) ySnakeArray[0] += cellSize;
+        else if (left) xSnakeArray[0] -= cellSize;
+        else if (right) xSnakeArray[0] += cellSize;
+    }
+
+    private void checkCollision(){
+        for (int i = cellsSnake; i>0; i--){
+            if ((i >= 5) && (xSnakeArray[0] == xSnakeArray[i]) && (ySnakeArray[0] == ySnakeArray[i])) {
+                inGame = false;
+                break;
+            }
+        }
+        if ((ySnakeArray[0] >= panelHeight) ||
+                (ySnakeArray[0] < 0) ||
+                (xSnakeArray[0] >= panelWidth) ||
+                (xSnakeArray[0] < 0)) {
+            inGame = false;
+        }
+        if (!inGame) timer.stop();
+    }
+
+    private void spawnApple(){
+        int newRandomAxis;
+
+        newRandomAxis = (int) (Math.random() * cellRandomX);
+        appleX = newRandomAxis * cellSize;
+
+        newRandomAxis = (int) (Math.random() * cellRandomY);
+        appleY = newRandomAxis * cellSize;
+    }
+
+    private void checkAppleEaten(){
+        if ((xSnakeArray[0] == appleX) && (ySnakeArray[0] == appleY)){
+            cellsSnake++;
             spawnApple();
         }
     }
 
     private void draw(Graphics g){
-        g.drawImage(item, itemX, itemY, this);
-        for (int i=0; i<cells;i++){
-            if (i==0){
-                g.drawImage(head, x[i], y[i], this);
+        if (inGame){
+            g.drawImage(apple, appleX, appleY, this);
+            for (int i = 0; i< cellsSnake; i++){
+                if (i==0){
+                    g.drawImage(head, xSnakeArray[i], ySnakeArray[i], this);
+                }
+                else{
+                    g.drawImage(body, xSnakeArray[i], ySnakeArray[i], this);
+                }
             }
-            else{
-                g.drawImage(body, x[i], y[i], this);
-            }
+            Toolkit.getDefaultToolkit().sync();
         }
-        Toolkit.getDefaultToolkit().sync();
+        else {
+            gameOver(g);
+        }
     }
 
     private void gameOver(Graphics g){
@@ -133,14 +142,15 @@ public class SnakePanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (inGame){
-            checkItemEaten();
+            checkAppleEaten();
             checkCollision();
             snakeMove();
         }
+        repaint();
     }
 
     @Override
-    public  void paintComponent(Graphics g){
+    public void paintComponent(Graphics g){
         super.paintComponent(g);
         draw(g);
     }
