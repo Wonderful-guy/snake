@@ -12,7 +12,7 @@ public class SnakePanel extends JPanel implements ActionListener {
     private final int cellsTotal = cellsPerWidth*cellsPerHeight; // количество ячеек на панели
     private final int delayGame = 300; // скорость игры, мс
 
-    private int cellsSnake; // из скольких ячеек состоит змея в данный момент
+    public int cellsSnake; // из скольких ячеек состоит змея в данный момент
     private int appleX; // координата яблока по оси X
     private int appleY; // координата яблока по оси Y
 
@@ -24,7 +24,7 @@ public class SnakePanel extends JPanel implements ActionListener {
 
     private boolean inGame = true; // показывает, продолжается ли игра
 
-    private Timer timer; // таймер игры
+    public Timer timer; // таймер игры
     private Image apple; // изображение яблока
     private Image headSegment; // изображение головы змеи
     private Image bodySegment; // изображение сегментов тела змеи
