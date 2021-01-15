@@ -140,7 +140,7 @@ public class SnakePanel extends JPanel implements ActionListener {
         while (appleCoordIsEqualToSnakeCoord); // если истинно, то пересчет координат яблока
     }
 
-    // метод, првоеряющий, было ли съедено ли яблоко змеей (головой змеи)
+    // метод, проверяющий, было ли съедено ли яблоко головой змеи
     private void checkAppleEaten(){
         if ((xSnakeArray[0] == appleX) && (ySnakeArray[0] == appleY)){
             cellsSnake++;
@@ -148,10 +148,11 @@ public class SnakePanel extends JPanel implements ActionListener {
         }
     }
 
+    // метод, перерисовывающий змею и яблоко
     private void draw(Graphics g){
         if (inGame){
-            g.drawImage(apple, appleX, appleY, this);
-            for (int i = 0; i< cellsSnake; i++){
+            g.drawImage(apple, appleX, appleY, this); // рисует яблоко
+            for (int i = 0; i< cellsSnake; i++){ // рисует голову змеи, тело змеи и последний сегмент змеи
                 if (i==0){
                     g.drawImage(headSegment, xSnakeArray[i], ySnakeArray[i], this);
                 }
@@ -169,15 +170,23 @@ public class SnakePanel extends JPanel implements ActionListener {
         }
     }
 
+    // метод, описывающий происходящее при окончании игры
     private void gameOver(Graphics g){
-        String message = "Game Over";
-        Font fontGameOver = new Font("Arial", Font.BOLD, 15);
-        FontMetrics metrics = getFontMetrics(fontGameOver);
+        String message = "Game Over"; // сообщение при конце игры
+        Font fontGameOver = new Font("Arial", Font.BOLD, 80); // шрифт сообщения
+        FontMetrics metrics = getFontMetrics(fontGameOver); // метрика (нужна, чтобы узнать длину/ширину строки)
 
-        g.setColor(Color.BLUE);
-        g.setFont(fontGameOver);
-        g.drawString(message, panelWidth, panelHeight);
+        g.setColor(Color.red); // цвет сообщения
+        g.setFont(fontGameOver); // установка шрифта для сообщения
 
+        int totalWidth = metrics.stringWidth(message); // полная ширина сообщения
+        int totalHeight = metrics.getHeight() - metrics.getAscent(); // полная высота сообщения
+
+        // координаты для размещения сообщения
+        int StringX = panelWidth/2 - totalWidth/2;
+        int StringY = panelHeight/2 + totalHeight/2  ;
+
+        g.drawString(message, StringX, StringY); // рисует сообщение при окончании игры
     }
 
     @Override
@@ -198,6 +207,8 @@ public class SnakePanel extends JPanel implements ActionListener {
 
     // класс, реализующий метод чтения с клавиатуры
     public class KeyMove extends KeyAdapter {
+
+        // метод, задающий направление змеи при нажатаии на ту или иную клавишу на клавиатуре
         public void keyPressed(KeyEvent e){
             int key = e.getKeyCode(); // переменной присваивается нажатая на клавиатуре клавиша
 
@@ -224,5 +235,3 @@ public class SnakePanel extends JPanel implements ActionListener {
         }
     }
 }
-
-
